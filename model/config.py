@@ -1,9 +1,10 @@
+ # -*- coding: utf-8 -*-
 import os
 
 
 from .general_utils import get_logger
 from .data_utils import get_trimmed_glove_vectors, load_vocab, \
-        get_processing_word
+        get_processing_word, get_trimmed_word2vec_vectors
 
 
 class Config():
@@ -51,7 +52,7 @@ class Config():
                 lowercase=False, allow_unk=False)
 
         # 3. get pre-trained embeddings
-        self.embeddings = (get_trimmed_glove_vectors(self.filename_trimmed)
+        self.embeddings = (get_trimmed_word2vec_vectors(self.filename_trimmed)
                 if self.use_pretrained else None)
 
 
@@ -65,17 +66,25 @@ class Config():
     dim_char = 100
 
     # glove files
-    filename_glove = "data/glove.6B/glove.6B.{}d.txt".format(dim_word)
+    filename_glove = "data/swectors-300dim.txt"
     # trimmed embeddings (created from glove_filename with build_data.py)
-    filename_trimmed = "data/glove.6B.{}d.trimmed.npz".format(dim_word)
+    filename_trimmed = "data/swectors-300dimtrim.txt.npz"
+    use_pretrained = True
+
+    # word2vec files
+    filename_word2vec = "data/swectors-300dim.txt"
+    # trimmed embeddings (created from glove_filename with build_data.py)
+    filename__word2vec_trimmed = "data/swectors-300dimtrim.txt.npz"
     use_pretrained = True
 
     # dataset
-    # filename_dev = "data/coNLL/eng/eng.testa.iob"
-    # filename_test = "data/coNLL/eng/eng.testb.iob"
-    # filename_train = "data/coNLL/eng/eng.train.iob"
+    filename_dev = "data/sic/annotated/dev.conll"
+    #filename_test = "data/sic/annotated/overfittingtest.conll"
+    filename_test = "data/sic/annotated/test.conll"
+    #filename_train = "data/sic/annotated/overfittingtrain.conll"
+    filename_train = "data/sic/annotated/train.conll"
 
-    filename_dev = filename_test = filename_train = "data/test.txt" # test
+    #filename_dev = filename_test = filename_train = "data/test.txt" # test
 
     max_iter = None # if not None, max number of examples in Dataset
 

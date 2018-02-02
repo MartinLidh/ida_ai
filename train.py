@@ -1,3 +1,4 @@
+ # -*- coding: utf-8 -*-
 from model.data_utils import CoNLLDataset
 from model.ner_model import NERModel
 from model.config import Config
@@ -18,7 +19,6 @@ def main():
                          config.processing_tag, config.max_iter)
     train = CoNLLDataset(config.filename_train, config.processing_word,
                          config.processing_tag, config.max_iter)
-
     # train model
     model.train(train, dev)
 

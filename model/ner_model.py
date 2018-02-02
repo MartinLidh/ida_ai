@@ -1,3 +1,4 @@
+ # -*- coding: utf-8 -*-
 import numpy as np
 import os
 import tensorflow as tf
@@ -252,12 +253,10 @@ class NERModel(BaseModel):
                 viterbi_seq, viterbi_score = tf.contrib.crf.viterbi_decode(
                         logit, trans_params)
                 viterbi_sequences += [viterbi_seq]
-
             return viterbi_sequences, sequence_lengths
 
         else:
             labels_pred = self.sess.run(self.labels_pred, feed_dict=fd)
-
             return labels_pred, sequence_lengths
 
 
@@ -352,5 +351,4 @@ class NERModel(BaseModel):
             words = zip(*words)
         pred_ids, _ = self.predict_batch([words])
         preds = [self.idx_to_tag[idx] for idx in list(pred_ids[0])]
-
         return preds

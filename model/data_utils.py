@@ -1,3 +1,4 @@
+ # -*- coding: utf-8 -*-
 import numpy as np
 import os
 
@@ -5,7 +6,7 @@ import os
 # shared global variables to be imported from model also
 UNK = "$UNK$"
 NUM = "$NUM$"
-NONE = "O"
+NONE = "_"
 
 
 # special error message
@@ -59,7 +60,7 @@ class CoNLLDataset(object):
 
     def __iter__(self):
         niter = 0
-        with open(self.filename) as f:
+        with open(self.filename, encoding='utf-8') as f:
             words, tags = [], []
             for line in f:
                 line = line.strip()
@@ -71,14 +72,22 @@ class CoNLLDataset(object):
                         yield words, tags
                         words, tags = [], []
                 else:
-                    ls = line.split(' ')
-                    word, tag = ls[0],ls[-1]
-                    if self.processing_word is not None:
-                        word = self.processing_word(word)
-                    if self.processing_tag is not None:
-                        tag = self.processing_tag(tag)
-                    words += [word]
-                    tags += [tag]
+                    ls = line.split('\t')
+                    if(len(ls)>10):
+                        word, tag = ls[1],ls[11]
+                        if self.processing_word is not None:
+                            word = self.processing_word(word)
+                        if self.processing_tag is not None:
+                            tag = self.processing_tag(tag)
+
+                        #Adding if statement to identify when we are processing words or word vectors
+                        #encoding problems is mainly caused by running on windows
+                        if(isinstance(word[0], str)):
+                            words += [str(word.encode('utf-8'))]
+                            tags += [str(tag.encode('utf-8'))]
+                        else:
+                            words += [word]
+                            tags += [tag]
 
 
     def __len__(self):
@@ -141,10 +150,28 @@ def get_glove_vocab(filename):
     """
     print("Building vocab...")
     vocab = set()
-    with open(filename) as f:
+    with open(filename, encoding="utf-8") as f:
         for line in f:
             word = line.strip().split(' ')[0]
             vocab.add(word)
+    print("- done. {} tokens".format(len(vocab)))
+    return vocab
+
+def get_word2vec_vocab(filename):
+    """Load vocab from file
+
+    Args:
+        filename: path to the word2vec vectors
+
+    Returns:
+        vocab: set() of strings
+    """
+    print("Building vocab...")
+    vocab = set()
+    with open(filename, encoding="utf-8") as f:
+        for line in f:
+            word = line.strip().split(' ')[0]
+            vocab.add(str(word.encode('utf-8')))
     print("- done. {} tokens".format(len(vocab)))
     return vocab
 
@@ -162,7 +189,7 @@ def write_vocab(vocab, filename):
         write a word per line
 
     """
-    print("Writing vocab...")
+    print("Writing vocab... "+filename)
     with open(filename, "w") as f:
         for i, word in enumerate(vocab):
             if i != len(vocab) - 1:
@@ -215,6 +242,27 @@ def export_trimmed_glove_vectors(vocab, glove_filename, trimmed_filename, dim):
                 embeddings[word_idx] = np.asarray(embedding)
 
     np.savez_compressed(trimmed_filename, embeddings=embeddings)
+def export_trimmed_word2vec_vectors(vocab, filename, trimmed_filename, dim):
+    """Saves word2vec vectors in numpy array
+
+    Args:
+        vocab: dictionary vocab[word] = index
+        glove_filename: a path to a glove file
+        trimmed_filename: a path where to store a matrix in npy
+        dim: (int) dimension of embeddings
+
+    """
+    embeddings = np.zeros([len(vocab), dim])
+    with open(filename, encoding ='utf-8') as f:
+        for line in f:
+            line = line.strip().split(' ')
+            word = line[0]
+            embedding = [float(x) for x in line[1:]]
+            if word in vocab:
+                word_idx = vocab[word]
+                embeddings[word_idx] = np.asarray(embedding)
+
+    np.savez_compressed(trimmed_filename, embeddings=embeddings)
 
 
 def get_trimmed_glove_vectors(filename):
@@ -227,15 +275,31 @@ def get_trimmed_glove_vectors(filename):
 
     """
     try:
-        with np.load(filename) as data:
+        with np.load(filename, encoding="utf-8") as data:
             return data["embeddings"]
 
     except IOError:
         raise MyIOError(filename)
 
 
+def get_trimmed_word2vec_vectors(filename):
+    """
+    Args:
+        filename: path to the npz file
+
+    Returns:
+        matrix of embeddings (np array)
+
+    """
+    try:
+        data = np.load(filename)
+        return data["embeddings"]
+
+    except IOError:
+        raise MyIOError(filename)
+
 def get_processing_word(vocab_words=None, vocab_chars=None,
-                    lowercase=False, chars=False, allow_unk=True):
+                    lowercase=True, chars=True, allow_unk=True):
     """Return lambda function that transform a word (string) into list,
     or tuple of (list, id) of int corresponding to the ids of the word and
     its corresponding characters.
@@ -262,17 +326,18 @@ def get_processing_word(vocab_words=None, vocab_chars=None,
             word = word.lower()
         if word.isdigit():
             word = NUM
-
         # 2. get id of word
+
         if vocab_words is not None:
-            if word in vocab_words:
-                word = vocab_words[word]
+            if str(word.encode(encoding = 'utf-8', errors='strict')) in vocab_words:
+                word = vocab_words[str(word.encode(encoding = 'utf-8', errors='strict'))]
             else:
                 if allow_unk:
-                    word = vocab_words[UNK]
+                    word = vocab_words[str(UNK.encode('utf-8'))]
                 else:
+                    print(word)
                     raise Exception("Unknow key is not allowed. Check that "\
-                                    "your vocab (tags?) is correct")
+                        "your vocab (tags?) is correct")
 
         # 3. return tuple char ids, word id
         if vocab_chars is not None and chars == True:
@@ -395,7 +460,7 @@ def get_chunks(seq, tags):
         result = [("PER", 0, 2), ("LOC", 3, 4)]
 
     """
-    default = tags[NONE]
+    default = tags[str(NONE.encode('utf-8'))]
     idx_to_tag = {idx: tag for tag, idx in tags.items()}
     chunks = []
     chunk_type, chunk_start = None, None

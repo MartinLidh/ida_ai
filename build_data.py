@@ -1,7 +1,8 @@
+ # -*- coding: utf-8 -*-
 from model.config import Config
-from model.data_utils import CoNLLDataset, get_vocabs, UNK, NUM, \
+from model.data_utils import CoNLLDataset, get_vocabs, get_word2vec_vocab, UNK, NUM, \
     get_glove_vocab, write_vocab, load_vocab, get_char_vocab, \
-    export_trimmed_glove_vectors, get_processing_word
+    export_trimmed_glove_vectors, export_trimmed_word2vec_vectors, get_processing_word
 
 
 def main():
@@ -30,11 +31,11 @@ def main():
 
     # Build Word and Tag vocab
     vocab_words, vocab_tags = get_vocabs([train, dev, test])
-    vocab_glove = get_glove_vocab(config.filename_glove)
+    vocab_word2vec = get_word2vec_vocab(config.filename_word2vec)
 
-    vocab = vocab_words & vocab_glove
-    vocab.add(UNK)
-    vocab.add(NUM)
+    vocab = vocab_words & vocab_word2vec
+    vocab.add(str(UNK.encode('utf-8')))
+    vocab.add(str(NUM.encode('utf-8')))
 
     # Save vocab
     write_vocab(vocab, config.filename_words)
@@ -42,8 +43,8 @@ def main():
 
     # Trim GloVe Vectors
     vocab = load_vocab(config.filename_words)
-    export_trimmed_glove_vectors(vocab, config.filename_glove,
-                                config.filename_trimmed, config.dim_word)
+    export_trimmed_word2vec_vectors(vocab, config.filename_word2vec,
+                                config.filename__word2vec_trimmed, config.dim_word)
 
     # Build and save char vocab
     train = CoNLLDataset(config.filename_train)
