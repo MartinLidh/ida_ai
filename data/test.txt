@@ -672,7 +672,7 @@ min	_
 kära	_
 syster	_
 å	_
-co	place
+co	_
 .	_
 :D	_
 Hoppas	_

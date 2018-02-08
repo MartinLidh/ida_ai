@@ -78,11 +78,11 @@ class Config():
     use_pretrained = True
 
     # dataset
-    filename_dev = "data/sic/annotated/dev.conll"
+    filename_dev = "data/sic/annotated/devCleaned.conll"
     #filename_test = "data/sic/annotated/overfittingtest.conll"
-    filename_test = "data/sic/annotated/test.conll"
+    filename_test = "data/sic/annotated/testCleaned.conll"
     #filename_train = "data/sic/annotated/overfittingtrain.conll"
-    filename_train = "data/sic/annotated/train.conll"
+    filename_train = "data/sic/annotated/trainCleaned.conll"
 
     #filename_dev = filename_test = filename_train = "data/test.txt" # test
 
@@ -97,7 +97,7 @@ class Config():
     train_embeddings = False
     nepochs          = 15
     dropout          = 0.5
-    batch_size       = 20
+    batch_size       = 4
     lr_method        = "adam"
     lr               = 0.001
     lr_decay         = 0.9

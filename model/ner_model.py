@@ -7,6 +7,7 @@ import tensorflow as tf
 from .data_utils import minibatches, pad_sequences, get_chunks
 from .general_utils import Progbar
 from .base_model import BaseModel
+from .gazetteer import Gazetteer
 
 
 class NERModel(BaseModel):
@@ -16,6 +17,7 @@ class NERModel(BaseModel):
         super(NERModel, self).__init__(config)
         self.idx_to_tag = {idx: tag for tag, idx in
                            self.config.vocab_tags.items()}
+        self.gazetteer = Gazetteer("data/gazetters.txt")
 
 
     def add_placeholders(self):
@@ -313,7 +315,6 @@ class NERModel(BaseModel):
         correct_preds, total_correct, total_preds = 0., 0., 0.
         for words, labels in minibatches(test, self.config.batch_size):
             labels_pred, sequence_lengths = self.predict_batch(words)
-
             for lab, lab_pred, length in zip(labels, labels_pred,
                                              sequence_lengths):
                 lab      = lab[:length]
@@ -323,7 +324,6 @@ class NERModel(BaseModel):
                 lab_chunks      = set(get_chunks(lab, self.config.vocab_tags))
                 lab_pred_chunks = set(get_chunks(lab_pred,
                                                  self.config.vocab_tags))
-
                 correct_preds += len(lab_chunks & lab_pred_chunks)
                 total_preds   += len(lab_pred_chunks)
                 total_correct += len(lab_chunks)
@@ -351,4 +351,5 @@ class NERModel(BaseModel):
             words = zip(*words)
         pred_ids, _ = self.predict_batch([words])
         preds = [self.idx_to_tag[idx] for idx in list(pred_ids[0])]
+        self.gazetteer.lookup_tags(words_raw, preds)
         return preds

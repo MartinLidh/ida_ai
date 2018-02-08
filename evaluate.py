@@ -1,6 +1,7 @@
 from model.data_utils import CoNLLDataset
 from model.ner_model import NERModel
 from model.config import Config
+from model.gazetteer import Gazetteer
 
 
 def align_data(data):
@@ -34,6 +35,7 @@ def align_data(data):
 
 
 def interactive_shell(model):
+
     """Creates interactive shell to play with model
 
     Args:
@@ -44,7 +46,9 @@ def interactive_shell(model):
 This is an interactive mode.
 To exit, enter 'exit'.
 You can enter a sentence like
-input> Jag älskar Linköping""")
+input> Martin reser till Stockholm""")
+
+    gazetteer = Gazetteer("data/gazetters.txt")
 
     while True:
         try:
@@ -60,6 +64,10 @@ input> Jag älskar Linköping""")
             break
 
         preds = model.predict(words_raw)
+
+        #use list of gazetteers to make corrections to predictions.
+        preds = gazetteer.lookup_tags(words_raw, preds)
+
         to_print = align_data({"input": words_raw, "output": preds})
 
         for key, seq in to_print.items():
