@@ -1,3 +1,5 @@
+AI bot by Martin lidh, continuted development on guillaumegenthial's NER tagger
+
 # Named Entity Recognition with Tensorflow
 
 This repo implements a NER model using Tensorflow (LSTM + CRF + chars embeddings).

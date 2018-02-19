@@ -18,8 +18,6 @@ class Gazetteer:
     def lookup_tags(self, words, tags):
         for i, word in enumerate(words):
             if word in self.gazetteer:
-                print(word)
-                print(self.gazetteer[word])
                 tags[i] = self.gazetteer[word]
         return tags
             
