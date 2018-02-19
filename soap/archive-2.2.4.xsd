@@ -1,0 +1,695 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="http://www.idainfront.se/schema/archive-2.2" xmlns:ii="http://www.idainfront.se/schema/archive-2.2">
+
+  <!-- ArchiveSip -->
+  <element name="ArchiveSip" type="ii:ArchiveSip">
+  </element>
+
+  <complexType name="ArchiveSip">
+    <complexContent>
+      <extension base="ii:ArchiveRequest">
+        <sequence>
+          <element name="ArchiveObject" type="ii:ArchiveObject" minOccurs="1" maxOccurs="1"></element>
+        </sequence>
+        <attribute name="producer" type="string" use="optional"></attribute>
+        <attribute name="system" type="string" use="optional"></attribute>
+        <attribute name="preprocessed" type="boolean" use="optional"></attribute>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <element name="ArchiveSipResponse" type="ii:ArchiveSipResponse"></element>
+
+  <complexType name="ArchiveSipResponse">
+    <sequence>
+      <element name="Id" type="ii:ObjectRef" minOccurs="1" maxOccurs="1"></element>
+    </sequence>
+  </complexType>
+
+  <element name="ArchiveSipFault" type="ii:FaultDetail" nillable="true"></element>
+
+  <complexType name="FaultDetail">
+    <sequence>
+      <element name="FaultCategory" type="ii:FaultCategory" minOccurs="1" maxOccurs="1"/>
+      <element name="FaultCode" type="integer" minOccurs="1" maxOccurs="1"/>
+      <element name="Message" type="string" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+  </complexType>
+
+  <simpleType name="FaultCategory">
+    <restriction base="string">
+      <enumeration value="INTERNAL_ERROR"></enumeration>
+      <enumeration value="META_DATA_ERROR"></enumeration>
+      <enumeration value="FILE_DATA_ERROR"></enumeration>
+      <enumeration value="MISSING_TARGET_ERROR"></enumeration>
+    </restriction>
+  </simpleType>
+
+  <!-- ArchiveSipAsynch -->
+
+  <element name="ArchiveSipAsynch" type="ii:ArchiveSip">
+  </element>
+
+  <element name="ArchiveSipAsynchResponse" type="ii:ArchiveSipAsynchResponse"></element>
+
+  <complexType name="ArchiveSipAsynchResponse">
+    <sequence>
+      <element name="MessageId" type="string" minOccurs="1" maxOccurs="1"></element>
+    </sequence>
+  </complexType>
+
+  <!-- GetSipStatus -->
+
+  <complexType name="GetSipStatus">
+    <complexContent>
+      <extension base="ii:ArchiveRequest">
+        <sequence>
+          <element name="MessageId" type="string" minOccurs="1" maxOccurs="1"></element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <element name="GetSipStatus" type="ii:GetSipStatus">
+  </element>
+
+  <complexType name="GetSipStatusResponse">
+    <sequence>
+      <element name="Status" minOccurs="1" maxOccurs="1" type="ii:GetSipStatusType">
+      </element>
+      <element name="Id" type="ii:ObjectRef" minOccurs="0" maxOccurs="1"></element>
+      <element name="Fault" type="ii:FaultDetail" minOccurs="0" maxOccurs="1"></element>
+    </sequence>
+  </complexType>
+
+  <element name="GetSipStatusResponse" type="ii:GetSipStatusResponse">
+  </element>
+  
+  <simpleType name="GetSipStatusType">
+    <restriction base="string">
+      <enumeration value="PROCESSING"></enumeration>
+      <enumeration value="ERROR"></enumeration>
+      <enumeration value="ARCHIVED"></enumeration>
+    </restriction>
+  </simpleType>
+
+  <!-- ValidatSipAsynch -->
+
+  <element name="ValidateSipAsynch" type="ii:ArchiveSip">
+  </element>
+
+  <element name="ValidateSipAsynchResponse" type="ii:ValidateSipAsynchResponse" />
+
+  <complexType name="ValidateSipAsynchResponse">
+    <sequence>
+      <element name="MessageId" type="string" minOccurs="1" maxOccurs="1" />
+    </sequence>
+  </complexType>
+
+  <!-- SearchAips -->
+
+  <element name="SearchAips" type="ii:SearchAips">
+  </element>
+
+  <element name="SearchAipsResponse" type="ii:SearchAipsResponse">
+  </element>
+
+  <complexType name="SearchRequest">
+    <complexContent>
+      <extension base="ii:ArchiveRequest">
+        <sequence>
+          <element name="Query" type="ii:Query" minOccurs="1" maxOccurs="unbounded" ></element>
+          <element name="SearchRootPath" type="ii:Path" minOccurs="0" maxOccurs="1"></element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  
+  <complexType name="SearchAips">
+    <complexContent>
+      <extension base="ii:SearchRequest">
+        <sequence>
+          <element name="Options" type="ii:SearchOptions" minOccurs="0" maxOccurs="1"></element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  
+  <complexType name="Query">
+    <sequence>
+      <element minOccurs="0" maxOccurs="unbounded" name="ObjectType" type="string"></element>
+      <element minOccurs="1" maxOccurs="unbounded" name="SearchCondition" type="ii:SearchCondition"></element>
+    </sequence>
+    <attribute name="type"  use="optional">
+      <simpleType>
+        <restriction base="string">
+           <enumeration value="MAIN" />
+           <enumeration value="ANCESTOR" />
+           <enumeration value="DESCENDANT" />
+        </restriction>
+      </simpleType>  
+   </attribute>
+  </complexType>
+  
+  <complexType name="SearchAipsResponse">
+    <sequence>
+      <element minOccurs="0" maxOccurs="1" name="TotalCount" type="long"></element>
+      <element minOccurs="0" maxOccurs="unbounded" name="ArchiveObject" type="ii:ArchiveObject"></element>
+    </sequence>
+  </complexType>
+  
+  <complexType name="SearchCondition">
+    <sequence>
+      <element name="Attribute" type="string" minOccurs="1" maxOccurs="1"></element>
+      <element minOccurs="1" name="Operator" type="ii:Operator" maxOccurs="1"></element>
+      <element minOccurs="1" name="Value" type="string" maxOccurs="unbounded"></element>
+    </sequence>
+  </complexType>
+
+  <simpleType name="Operator">
+    <restriction base="string">
+      <enumeration value="EQUAL" />
+      <enumeration value="NOT_EQUAL" />
+      <enumeration value="MATCHES" />
+      <enumeration value="LESS_OR_EQUAL" />
+      <enumeration value="LESS" />
+      <enumeration value="GREATER_OR_EQUAL" />
+      <enumeration value="GREATER" />
+      <enumeration value="IN" />
+    </restriction>
+  </simpleType>
+
+  <!-- GetAip -->
+
+  <element name="GetAip" type="ii:GetAip" />
+
+  <element name="GetAipResponse" type="ii:GetAipResponse" />
+
+  <complexType name="GetAip">
+    <complexContent>
+      <extension base="ii:ArchiveRequest">
+        <sequence>
+          <element name="Id" type="ii:ObjectRef" minOccurs="1" maxOccurs="1"/>
+          <element name="RequestedAttributes" type="ii:RequestedAttributes"
+                   minOccurs="0" maxOccurs="1">
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <complexType name="GetAipResponse">
+    <sequence>
+      <element minOccurs="1" maxOccurs="1" name="ArchiveObject" type="ii:ArchiveObject" />
+    </sequence>
+  </complexType>
+
+  <!-- GetFileContent -->
+
+  <element name="GetFileContent" type="ii:GetFileContent">
+  </element>
+
+  <element name="GetFileContentResponse" type="ii:GetFileContentResponse">
+  </element>
+
+  <complexType name="GetFileContent">
+    <complexContent>
+      <extension base="ii:ArchiveRequest">
+        <sequence>
+          <element name="Id" type="ii:ObjectRef" minOccurs="1" maxOccurs="1"></element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <complexType name="GetFileContentResponse">
+    <sequence>
+      <element minOccurs="0" maxOccurs="1" name="File" type="ii:File">
+      </element>
+    </sequence>
+  </complexType>
+  
+    <!-- GetFileUrl -->
+
+  <element name="GetFileUrl" type="ii:GetFileUrl">
+  </element>
+
+  <element name="GetFileUrlResponse" type="ii:GetFileUrlResponse">
+  </element>
+
+  <complexType name="GetFileUrl">
+    <complexContent>
+      <extension base="ii:ArchiveRequest">
+        <sequence>
+          <element name="Id" type="ii:ObjectRef" minOccurs="1" maxOccurs="1"></element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <complexType name="GetFileUrlResponse">
+    <sequence>
+      <element minOccurs="0" maxOccurs="1" name="FileUrl" type="string">
+      </element>
+    </sequence>
+  </complexType>
+
+  <!-- GetMetaData -->
+
+  <element name="GetMetaData" type="ii:GetMetaData">
+  </element>
+
+  <element name="GetMetaDataResponse" type="ii:GetMetaDataResponse">
+  </element>
+  <complexType name="GetMetaData">
+    <complexContent>
+      <extension base="ii:ArchiveRequest"></extension>
+    </complexContent>
+  </complexType>
+  <complexType name="GetMetaDataResponse">
+    <sequence>
+      <element name="AttributeType" type="ii:AttributeType" minOccurs="0" maxOccurs="unbounded"></element>
+      <element minOccurs="0" maxOccurs="unbounded" name="ObjectType" type="ii:ObjectType"></element>
+    </sequence>
+  </complexType>
+  <complexType name="ObjectType">
+    <sequence>
+      <element name="Name" type="string" minOccurs="1" maxOccurs="1">
+      </element>
+      <element name="ArchiveType" type="ii:ArchiveObjectType" minOccurs="1" maxOccurs="1">
+      </element>
+      <element name="DisplayName" type="string" minOccurs="0" maxOccurs="1">
+      </element>
+      <element name="Description" type="string" minOccurs="0" maxOccurs="1">
+      </element>
+      <element minOccurs="0" maxOccurs="unbounded" name="Attribute" type="ii:AttributeType">
+      </element>
+      <element name="PossibleChildren" type="ii:PossibleChildren" minOccurs="0" maxOccurs="1">
+      </element>
+      <element name="ExternalProperties" type="ii:ExternalProperties" minOccurs="0" maxOccurs="1"></element>
+    </sequence>
+
+  </complexType>
+  <complexType name="AttributeType">
+    <sequence>
+      <element name="Name" type="string" minOccurs="1" maxOccurs="1">
+      </element>
+      <element name="Type" type="ii:BasicType" minOccurs="1" maxOccurs="1">
+      </element>
+      <element name="DisplayName" type="string" minOccurs="0" maxOccurs="1">
+      </element>
+      <element name="Description" type="string" minOccurs="0" maxOccurs="1">
+      </element>
+      <element name="PossibleValues" type="ii:Values" minOccurs="0" maxOccurs="1">
+      </element>
+      <element name="DefaultValues" type="ii:Values" minOccurs="0" maxOccurs="1">
+      </element>
+      <element name="ExternalProperties" type="ii:ExternalProperties" minOccurs="0"
+        maxOccurs="1"></element>
+    </sequence>
+    <attribute name="multiValued" type="boolean"></attribute>
+    <attribute name="required" type="boolean"></attribute>
+    <attribute name="readOnly" type="boolean"></attribute>
+  </complexType>
+
+  <complexType name="PossibleChildren">
+    <sequence>
+      <element name="ObjectType" type="string" minOccurs="0" maxOccurs="unbounded"></element>
+    </sequence>
+  </complexType>
+
+  <simpleType name="ArchiveObjectType">
+    <restriction base="string">
+      <enumeration value="folder"></enumeration>
+      <enumeration value="spreadtype"></enumeration>
+      <enumeration value="archiveobject"></enumeration>
+      <enumeration value="document"></enumeration>
+      <enumeration value="file"></enumeration>
+    </restriction>
+  </simpleType>
+
+  <simpleType name="BasicType">
+    <restriction base="string">
+      <enumeration value="string"></enumeration>
+      <enumeration value="date"></enumeration>
+      <enumeration value="long"></enumeration>
+      <enumeration value="boolean"></enumeration>
+      <enumeration value="objref"></enumeration>
+      <enumeration value="double"></enumeration>
+    </restriction>
+  </simpleType>
+
+  <complexType name="Values">
+    <sequence>
+      <element name="value" type="string" minOccurs="0" maxOccurs="unbounded"></element>
+    </sequence>
+  </complexType>
+
+  <complexType name="ExternalProperties">
+    <sequence>
+      <element name="Property" type="ii:NameValue" minOccurs="0" maxOccurs="unbounded"></element>
+    </sequence>
+  </complexType>
+
+  <!-- GetChildren -->
+  <element name="GetChildren" type="ii:GetChildren">
+  </element>
+
+  <element name="GetChildrenResponse" type="ii:GetChildrenResponse">
+  </element>
+
+  <complexType name="GetChildren">
+    <complexContent>
+      <extension base="ii:ArchiveRequest">
+        <sequence>
+          <element name="Id" type="ii:ObjectRef" minOccurs="0" maxOccurs="1"></element>
+          <element name="RequestedAttributes" type="ii:RequestedAttributes" 
+                   minOccurs="0" maxOccurs="1">
+          </element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <complexType name="GetChildrenResponse">
+    <sequence>
+      <element minOccurs="0" maxOccurs="unbounded" name="Object" type="ii:Object">
+      </element>
+    </sequence>
+  </complexType>
+
+  <!-- OrderDip -->
+  <element name="OrderDip" type="ii:OrderDip"></element>
+
+  <complexType name="OrderDip">
+    <complexContent>
+      <extension base="ii:ArchiveRequest">
+        <sequence>
+          <element name="OrderList" type="ii:OrderList" minOccurs="1" maxOccurs="1"></element>
+          <element name="Customer" type="ii:Customer" minOccurs="1" maxOccurs="1"></element>
+        </sequence>
+        <attribute name="deliveryChannel" type="string" use="optional"></attribute>
+        <attribute name="includeFileContent" type="boolean" use="optional"></attribute>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <complexType name="OrderList">
+    <sequence>
+      <element name="OrderItem" type="ii:ObjectRef" minOccurs="1" maxOccurs="unbounded"></element>
+    </sequence>
+  </complexType>
+
+  <complexType name="Customer">
+    <sequence>
+      <element name="Name" type="ii:FullName" minOccurs="1" maxOccurs="1"/>
+      <element name="StreetAddress" type="string" minOccurs="1" maxOccurs="1"/>
+      <element name="CoAddress" type="string" minOccurs="0" maxOccurs="1" />
+      <element name="ZipCode" type="int" minOccurs="1" maxOccurs="1"/>
+      <element name="PostalArea" type="string" minOccurs="1" maxOccurs="1"/>
+      <element name="Email" type="string" minOccurs="1" maxOccurs="1"/>
+      <element name="Phone" type="string" minOccurs="1" maxOccurs="1"/>
+      <element name="Comment" type="string" minOccurs="0" maxOccurs="1" />
+    </sequence>
+  </complexType>
+
+  <complexType name="FullName">
+    <sequence>
+      <element name="FirstName" type="string" minOccurs="1" maxOccurs="1"/>
+      <element name="LastName" type="string" minOccurs="1" maxOccurs="1"/>
+    </sequence>
+  </complexType>
+
+  <element name="OrderDipResponse" type="ii:OrderDipResponse"></element>
+
+  <complexType name="OrderDipResponse">
+    <sequence>
+      <element name="Id" type="string" minOccurs="1" maxOccurs="1"></element>
+    </sequence>
+  </complexType>
+
+  <!-- OrderDipFast -->
+  <element name="OrderDipFast" type="ii:OrderDipFast"></element>
+
+  <complexType name="OrderDipFast">
+    <complexContent>
+      <extension base="ii:ArchiveRequest">
+        <sequence>
+          <element name="OrderList" type="ii:OrderList" minOccurs="1" maxOccurs="1"></element>
+          <element name="Customer" type="ii:OrderDipFastCustomer" minOccurs="1" maxOccurs="1"></element>
+          <any minOccurs="0" maxOccurs="unbounded"></any>
+        </sequence>
+        <attribute name="deliveryChannel" type="string" use="optional" default="E-post"></attribute>
+        <attribute name="includeFileContent" type="boolean" use="optional" default="true"></attribute>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <complexType name="OrderDipFastCustomer">
+    <sequence>
+      <element name="Name" type="ii:FullName" minOccurs="1" maxOccurs="1"/>
+      <element name="StreetAddress" type="string" minOccurs="0" maxOccurs="1"/>
+      <element name="CoAddress" type="string" minOccurs="0" maxOccurs="1" />
+      <element name="ZipCode" type="int" minOccurs="0" maxOccurs="1"/>
+      <element name="PostalArea" type="string" minOccurs="0" maxOccurs="1"/>
+      <element name="Email" type="string" minOccurs="1" maxOccurs="1"/>
+      <element name="Phone" type="string" minOccurs="0" maxOccurs="1"/>
+      <element name="Comment" type="string" minOccurs="0" maxOccurs="1" />
+    </sequence>
+  </complexType>
+
+  <element name="OrderDipFastResponse" type="ii:OrderDipFastResponse"></element>
+
+  <complexType name="OrderDipFastResponse">
+    <sequence>
+      <element name="Id" type="string" minOccurs="1" maxOccurs="1"></element>
+      <element name="Status" type="string" minOccurs="1" maxOccurs="1"></element>
+    </sequence>
+  </complexType>
+
+
+  <!-- GetSubmissionAgreement -->
+
+  <element name="GetSubmissionAgreements" type="ii:GetSubmissionAgreements">
+  </element>
+
+  <element name="GetSubmissionAgreementsResponse" type="ii:GetSubmissionAgreementsResponse">
+  </element>
+
+  <complexType name="GetSubmissionAgreements">
+    <complexContent>
+      <extension base="ii:ArchiveRequest"></extension>
+    </complexContent>
+  </complexType>
+
+  <complexType name="GetSubmissionAgreementsResponse">
+    <sequence>
+      <element name="SubmissionAgreement" type="ii:SubmissionAgreement" minOccurs="0"
+        maxOccurs="unbounded"></element>
+    </sequence>
+  </complexType>
+
+  <complexType name="SubmissionAgreement">
+    <sequence>
+      <element name="System" type="ii:System" minOccurs="0" maxOccurs="unbounded">
+      </element>
+    </sequence>
+    <attribute name="producer" type="string"></attribute>
+  </complexType>
+
+  <complexType name="System">
+    <sequence>
+
+      <element name="AipConfiguration" type="ii:AipConfiguration" minOccurs="0" maxOccurs="unbounded">
+      </element>
+    </sequence>
+    <attribute name="name" type="string"></attribute>
+  </complexType>
+
+  <complexType name="AipConfiguration">
+    <sequence>
+      <element name="ObjectType" type="string" minOccurs="1" maxOccurs="1"></element>
+      <element name="StoragePath" type="ii:Path" minOccurs="0" maxOccurs="1"></element>
+      <element name="StorePolicy" type="ii:StorePolicy" minOccurs="1" maxOccurs="1"></element>
+      <element name="ManualArchivingAllowed" type="boolean" minOccurs="1" maxOccurs="1"></element>
+    </sequence>
+  </complexType>
+
+  <simpleType name="StorePolicy">
+    <restriction base="string">
+      <!-- "Ingen komplettering av metadata tillåten, dubbletter av AIP tillåtet" -->
+      <enumeration value="SupplementsDisallowedDuplicatesAllowed" />
+      <!-- "Ingen komplettering tillåten, dubblett på AIP avvisas" -->
+      <enumeration value="SupplementsDisallowedDuplicatesDisallowed" />
+      <!-- "Ingen komplettering av metadata tillåten, komplettering av innehåll tillåtet" -->
+      <enumeration value="SupplementsAllowed" />
+      <!-- "Komplettering av metadata tillåtet, komplettering av innehåll tillåtet" or
+           "Uppdatering av metadata tillåtet, komplettering av innehåll tillåtet" -->
+      <enumeration value="SupplementsAndUpdatesAllowed" />
+    </restriction>
+  </simpleType>
+
+  <!-- PreprocessSip -->
+
+  <element name="PreprocessSip" type="ii:ArchiveSip" />
+  <element name="PreprocessSipResponse" type="ii:GetAipResponse" />
+  <element name="PreprocessSipFault" type="ii:FaultDetail" nillable="true"></element>
+
+  <!-- ************* -->
+  <!-- Archive model -->
+  <!-- ************* -->
+
+  <complexType name="Document">
+    <annotation>
+      <documentation>
+        Description of an index document.
+      </documentation>
+    </annotation>
+    <complexContent>
+      <extension base="ii:Object">
+        <sequence>
+          <element name="File" type="ii:File" minOccurs="0" maxOccurs="unbounded"></element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <complexType name="File">
+    <annotation>
+      <documentation>Description of an index file.</documentation>
+    </annotation>
+    <complexContent>
+      <extension base="ii:Object">
+        <sequence>
+          <element name="Content" type="ii:Content" minOccurs="0" maxOccurs="1"></element>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <complexType name="NameValue">
+    <sequence>
+      <element name="Value" minOccurs="1" maxOccurs="unbounded" type="string" nillable="true">
+        <annotation>
+          <documentation>Value for an attribute.</documentation>
+        </annotation>
+      </element>
+    </sequence>
+    <attribute name="name" type="string" use="required" />
+  </complexType>
+
+  <complexType name="Path">
+    <sequence>
+      <element name="Folder" type="string" minOccurs="1" maxOccurs="unbounded">
+      </element>
+    </sequence>
+  </complexType>
+
+  <complexType name="ArchiveObject">
+    <complexContent>
+      <extension base="ii:Object">
+        <sequence>
+          <element name="StoragePath" type="ii:Path" minOccurs="0" maxOccurs="1"></element>
+          <choice>
+            <element name="File" type="ii:File" minOccurs="0" maxOccurs="unbounded">
+            </element>
+            <element name="Document" type="ii:Document" minOccurs="0" maxOccurs="unbounded">
+            </element>
+          </choice>
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+
+  <simpleType name="ObjectRef">
+    <restriction base="string">
+      <minLength value="1"></minLength>
+    </restriction>
+  </simpleType>
+
+  <complexType name="Object">
+    <sequence>
+      <element name="Id" type="ii:ObjectRef" minOccurs="0" maxOccurs="1" />
+      <element name="DisplayName" type="string" minOccurs="1" maxOccurs="1">
+      </element>
+      <element name="ObjectType" type="string" minOccurs="0" maxOccurs="1">
+      </element>
+      <element name="Attribute" type="ii:NameValue" minOccurs="0" maxOccurs="unbounded">
+      </element>
+    </sequence>
+  </complexType>
+
+  <complexType name="Content">
+    <sequence>
+      <element name="Data" type="base64Binary" minOccurs="0" maxOccurs="1"></element>
+    </sequence>
+    <attribute name="encoding" type="string" use="optional"></attribute>
+    <attribute name="digest" type="string" use="optional"></attribute>
+  </complexType>
+
+  <complexType name="ArchiveRequest">
+    <attribute name="callerId" type="string" use="optional"></attribute>
+  </complexType>
+
+
+  <complexType name="RequestedAttributes">
+    <sequence>
+      <element name="Attribute" type="string" minOccurs="1" maxOccurs="unbounded"></element>
+    </sequence>
+  </complexType>
+
+  <complexType name="SearchOptions">
+    <sequence>
+      <element name="RequestedAttributes" type="ii:RequestedAttributes"
+        minOccurs="0" maxOccurs="1">
+      </element>
+      <element name="SortOrder" type="ii:SortOrder" minOccurs="0" maxOccurs="1"></element>
+      <element name="Offset" type="int" minOccurs="0" maxOccurs="1"></element>
+      <element name="PageSize" type="int" minOccurs="0" maxOccurs="1"></element>
+      <element name="ReturnTotalCount" type="boolean" minOccurs="0" maxOccurs="1"></element>
+    </sequence>
+  </complexType>
+
+  <complexType name="SortOrder">
+    <sequence>
+      <element name="SortOrderDirective" type="ii:SortOrderDirective" minOccurs="1" maxOccurs="unbounded"></element>
+    </sequence>
+  </complexType>
+
+  <complexType name="SortOrderDirective">
+        <annotation>
+          <documentation></documentation>
+        </annotation>
+        <sequence>
+      <element name="Attribute" type="string" minOccurs="1" maxOccurs="1"></element>
+      <element name="Order" minOccurs="0" maxOccurs="1" type="ii:Order">
+                <annotation>
+                  <documentation></documentation>
+                </annotation>
+      </element>
+    </sequence>
+  </complexType>
+
+  <simpleType name="Order">
+    <restriction base="string">
+      <enumeration value="ASC"></enumeration>
+      <enumeration value="DESC"></enumeration>
+    </restriction>
+  </simpleType>
+
+  <complexType name="CountAips">
+    <complexContent>
+      <extension base="ii:SearchRequest"></extension>
+    </complexContent>
+  </complexType>
+
+  <complexType name="CountAipsResponse">
+    <sequence>
+      <element name="Number" type="long"></element>
+    </sequence>
+  </complexType>
+
+    <element name="CountAips" type="ii:CountAips"></element>
+
+    <element name="CountAipsResponse" type="ii:CountAipsResponse"></element>
+</schema>

@@ -1,0 +1,24 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:arc="http://www.idainfront.se/schema/archive-2.2">
+   <soapenv:Header name="HTTP_ROLE">Internet anonym</soapenv:Header>
+   <soapenv:Body>
+      <arc:SearchAips callerId="ssa">
+         <!--1 or more repetitions:-->
+         <arc:Query type="DESCENDANT">
+            <!--Zero or more repetitions:-->
+            <arc:ObjectType>120_slutbetyg</arc:ObjectType>
+            <!--1 or more repetitions:-->
+            <arc:SearchCondition>
+               <arc:Attribute>text_search</arc:Attribute>
+               <arc:Operator>EQUAL</arc:Operator>
+               <!--1 or more repetitions:-->
+               <arc:Value>*Daniel*</arc:Value>
+            </arc:SearchCondition>
+         </arc:Query>
+         <!--Optional:-->
+         <arc:SearchRootPath>
+            <!--1 or more repetitions:-->
+            <arc:Folder>|</arc:Folder>
+         </arc:SearchRootPath>
+      </arc:SearchAips>
+   </soapenv:Body>
+</soapenv:Envelope>
